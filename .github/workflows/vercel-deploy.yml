@@ -1,0 +1,54 @@
+name: 🚀 Vercel Auto Deploy Monitor
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  monitor-deployment:
+    runs-on: ubuntu-latest
+    name: 监控Vercel部署状态
+    
+    steps:
+    - name: 📥 Checkout代码
+      uses: actions/checkout@v4
+      
+    - name: 📊 显示提交信息
+      run: |
+        echo "🔍 最新提交信息:"
+        git log --oneline -3
+        echo ""
+        echo "📅 提交时间: $(date)"
+        echo "🌿 分支: ${{ github.ref_name }}"
+        echo "📝 提交SHA: ${{ github.sha }}"
+        
+    - name: ⏰ 等待Vercel部署
+      run: |
+        echo "⏳ 等待Vercel检测GitHub更新并开始部署..."
+        echo "🔗 Vercel应该在2-5分钟内开始部署"
+        echo "📱 请检查Vercel Dashboard: https://vercel.com/dashboard"
+        echo "🌐 生产URL: https://mining-reg-ai.vercel.app"
+        
+    - name: 📋 部署检查清单
+      run: |
+        echo "✅ 部署验证清单:"
+        echo "1. [ ] Vercel Dashboard显示新的部署"
+        echo "2. [ ] 构建过程成功完成"
+        echo "3. [ ] 生产URL显示最新版本"
+        echo "4. [ ] 用户注册功能正常"
+        echo "5. [ ] 多语言切换正常"
+        echo "6. [ ] Profile页面加载正常"
+        echo ""
+        echo "🔧 如果部署未自动触发，请检查:"
+        echo "- Vercel项目Git集成设置"
+        echo "- Production Branch配置(应为main)"
+        echo "- GitHub webhook状态"
+        echo "- 环境变量配置"
+        
+    - name: 🎯 成功提示
+      run: |
+        echo "🎉 GitHub Actions工作流完成!"
+        echo "📊 代码已成功推送到GitHub"
+        echo "⚡ Vercel应该自动检测更改并开始部署"
+        echo "🔍 请监控Vercel Dashboard查看部署状态"

@@ -92,9 +92,21 @@
       "destination": "/api/webhooks/:path*"
     }
   ],
-  "regions": ["iad1", "sfo1", "fra1"],
+  "regions": ["iad1"],
+  "github": {
+    "enabled": true,
+    "autoAlias": true,
+    "silent": false
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
   "env": {
     "NODE_ENV": "production",
-    "DEPLOYMENT_TRIGGER": "2025-01-29"
+    "DEPLOYMENT_TRIGGER": "2025-01-29",
+    "VERCEL_AUTO_DEPLOY": "enabled",
+    "FORCE_REDEPLOY": "true"
   }
 }

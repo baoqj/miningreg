@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// MiningReg Extended Database Schema
+// 加拿大采矿法规AI法律助手系统完整数据库架构
 
 generator client {
   provider = "prisma-client-js"
@@ -10,24 +10,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// NextAuth.js required models
+// ================================
+// 用户管理 (User Management)
+// ================================
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  name              String?
+  image             String?
+  role              UserRole @default(USER)
+  status            UserStatus @default(ACTIVE)
+  emailVerified     DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  lastLoginAt       DateTime?
+  
+  // 用户偏好设置
+  preferences       UserPreferences?
+  
+  // 关联关系
+  accounts          Account[]
+  sessions          Session[]
+  organizationMembers OrganizationMember[]
+  projectMembers    ProjectMember[]
+  consultations     Consultation[]
+  documents         Document[]
+  promptTemplates   PromptTemplate[]
+  legalQueries      LegalQuery[]
+  subscriptions     Subscription[]
+  createdProjects   Project[] @relation("ProjectCreator")
+  reports           Report[]
+  conversations     Conversation[]
+  
+  @@map("users")
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
@@ -36,257 +72,66 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?   // For email/password auth
-  role          UserRole  @default(USER)
-  title         String?   // Job title like "Senior Legal Analyst"
-  phone         String?
-  language      String    @default("en")
-  timezone      String    @default("America/Toronto")
+model UserPreferences {
+  id                String @id @default(cuid())
+  userId            String @unique
+  language          String @default("en") // en, fr
+  jurisdiction      String @default("federal") // federal, ontario, bc, alberta, etc.
+  timezone          String @default("America/Toronto")
+  emailNotifications Boolean @default(true)
+  theme             String @default("light") // light, dark
   
-  // Preferences
-  jurisdictionPreferences JurisdictionPreference[]
-  notificationSettings   NotificationSettings?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Relationships
-  accounts      Account[]
-  sessions      Session[]
-  organizationMemberships OrganizationMembership[]
-  teamMemberships TeamMembership[]
-  subscriptions Subscription[]
-  invitations   Invitation[]
-
-  // New relationships for extended functionality
-  projects      Project[]
-  projectMemberships ProjectMembership[]
-  documents     Document[]
-  consultations Consultation[]
-  legalQueries  LegalQuery[]
-  promptTemplates PromptTemplate[]
-  reports       Report[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("user_preferences")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+// ================================
+// 组织和团队管理 (Organization & Team Management)
+// ================================
 
-  @@unique([identifier, token])
-}
-
-// User roles
-enum UserRole {
-  USER
-  TEAM_ADMIN
-  ORG_ADMIN
-  SUPER_ADMIN
-}
-
-// Organizations
 model Organization {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
-  logo        String?
-  website     String?
-  industry    String?
-  size        String?  // "1-10", "11-50", "51-200", "201-1000", "1000+"
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String?
+  industry        String?  // mining, consulting, legal, government
+  size            OrganizationSize @default(SMALL)
+  country         String   @default("CA")
+  province        String?
+  city            String?
+  website         String?
+  logo            String?
+  status          OrganizationStatus @default(ACTIVE)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   
-  // Settings
-  settings    OrganizationSettings?
+  // 关联关系
+  members         OrganizationMember[]
+  projects        Project[]
+  subscriptions   Subscription[]
   
-  // Relationships
-  memberships OrganizationMembership[]
-  teams       Team[]
-  subscriptions Subscription[]
-  invitations Invitation[]
-  projects    Project[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("organizations")
 }
 
-model OrganizationMembership {
+model OrganizationMember {
   id             String   @id @default(cuid())
   userId         String
   organizationId String
-  role           OrgRole  @default(MEMBER)
+  role           OrganizationRole @default(MEMBER)
+  status         MemberStatus @default(ACTIVE)
   joinedAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   @@unique([userId, organizationId])
-}
-
-enum OrgRole {
-  MEMBER
-  ADMIN
-  OWNER
-}
-
-// Teams within organizations
-model Team {
-  id             String   @id @default(cuid())
-  name           String
-  description    String?
-  organizationId String
-  
-  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  memberships  TeamMembership[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TeamMembership {
-  id     String   @id @default(cuid())
-  userId String
-  teamId String
-  role   TeamRole @default(MEMBER)
-  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  
-  @@unique([userId, teamId])
-}
-
-enum TeamRole {
-  MEMBER
-  LEAD
-  ADMIN
-}
-
-// Invitations
-model Invitation {
-  id             String           @id @default(cuid())
-  email          String
-  token          String           @unique
-  type           InvitationType
-  role           String           // Role to assign when accepted
-  organizationId String?
-  teamId         String?
-  invitedBy      String
-  expiresAt      DateTime
-  acceptedAt     DateTime?
-  
-  inviter      User          @relation(fields: [invitedBy], references: [id])
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime @default(now())
-}
-
-enum InvitationType {
-  ORGANIZATION
-  TEAM
-}
-
-// Subscriptions
-model Subscription {
-  id             String           @id @default(cuid())
-  type           SubscriptionType
-  plan           SubscriptionPlan
-  status         SubscriptionStatus @default(ACTIVE)
-  userId         String?
-  organizationId String?
-  
-  // Billing
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  stripePriceId        String?
-  currentPeriodStart   DateTime?
-  currentPeriodEnd     DateTime?
-  
-  user         User?         @relation(fields: [userId], references: [id])
-  organization Organization? @relation(fields: [organizationId], references: [id])
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum SubscriptionType {
-  PERSONAL
-  TEAM
-  ORGANIZATION
-}
-
-enum SubscriptionPlan {
-  FREE
-  BASIC
-  PROFESSIONAL
-  ENTERPRISE
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  CANCELED
-  PAST_DUE
-  UNPAID
-}
-
-// User preferences
-model JurisdictionPreference {
-  id           String @id @default(cuid())
-  userId       String
-  jurisdiction String // "federal", "ontario", "bc", "alberta", "municipal"
-  enabled      Boolean @default(true)
-  priority     Int     @default(0)
-  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@unique([userId, jurisdiction])
-}
-
-model NotificationSettings {
-  id                    String  @id @default(cuid())
-  userId                String  @unique
-  
-  // Email notifications
-  emailLegalUpdates     Boolean @default(true)
-  emailComplianceAlerts Boolean @default(true)
-  emailRegulatoryChanges Boolean @default(true)
-  emailTeamInvites      Boolean @default(true)
-  emailReportReviews    Boolean @default(true)
-  
-  // In-app notifications
-  inAppLegalUpdates     Boolean @default(true)
-  inAppComplianceAlerts Boolean @default(true)
-  inAppRegulatoryChanges Boolean @default(true)
-  inAppTeamInvites      Boolean @default(true)
-  inAppReportReviews    Boolean @default(true)
-  
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model OrganizationSettings {
-  id             String @id @default(cuid())
-  organizationId String @unique
-  
-  // Default jurisdiction preferences for new members
-  defaultJurisdictions String @default("[]") // JSON array of jurisdictions
-  
-  // Branding
-  primaryColor   String? @default("#1e3a8a")
-  secondaryColor String? @default("#fbbf24")
-  
-  // Features
-  enableTeams           Boolean @default(true)
-  enableReportSharing   Boolean @default(true)
-  enableExpertAccess    Boolean @default(false)
-  requireTwoFactor      Boolean @default(false)
-  
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@map("organization_members")
 }
 
 // ================================
@@ -303,7 +148,7 @@ model Project {
   priority        ProjectPriority @default(MEDIUM)
   jurisdiction    String   @default("federal")
   location        String?
-  coordinates     String?  // JSON: {lat, lng}
+  coordinates     Json?    // {lat: number, lng: number}
   startDate       DateTime?
   endDate         DateTime?
   budget          Decimal? @db.Decimal(15,2)
@@ -313,22 +158,23 @@ model Project {
   createdBy       String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
+  
   // 关联关系
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  creator         User         @relation(fields: [createdBy], references: [id])
-  memberships     ProjectMembership[]
+  creator         User         @relation("ProjectCreator", fields: [createdBy], references: [id])
+  members         ProjectMember[]
   documents       Document[]
   consultations   Consultation[]
   legalQueries    LegalQuery[]
   reports         Report[]
   milestones      ProjectMilestone[]
-
+  conversations   Conversation[]
+  
   @@unique([organizationId, slug])
   @@map("projects")
 }
 
-model ProjectMembership {
+model ProjectMember {
   id        String   @id @default(cuid())
   userId    String
   projectId String
@@ -336,12 +182,12 @@ model ProjectMembership {
   status    MemberStatus @default(ACTIVE)
   joinedAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
+  
   @@unique([userId, projectId])
-  @@map("project_memberships")
+  @@map("project_members")
 }
 
 model ProjectMilestone {
@@ -354,8 +200,473 @@ model ProjectMilestone {
   priority    ProjectPriority @default(MEDIUM)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
+  
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
+  
   @@map("project_milestones")
+}
+
+// ================================
+// 文档管理 (Document Management)
+// ================================
+
+model Document {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  type          DocumentType @default(GENERAL)
+  category      String?
+  jurisdiction  String   @default("federal")
+  language      String   @default("en")
+  version       String   @default("1.0")
+  status        DocumentStatus @default(DRAFT)
+  fileUrl       String?
+  fileName      String?
+  fileSize      Int?     // bytes
+  mimeType      String?
+  content       String?  @db.Text
+  metadata      Json?    // 额外的元数据
+  tags          String[] // 标签数组
+  isPublic      Boolean  @default(false)
+  projectId     String?
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // 关联关系
+  project       Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // RAG相关
+  vectorEmbeddings DocumentEmbedding[]
+  
+  @@map("documents")
+}
+
+// ================================
+// RAG和向量数据库 (RAG & Vector Database)
+// ================================
+
+model DocumentEmbedding {
+  id          String   @id @default(cuid())
+  documentId  String
+  chunkIndex  Int      // 文档分块索引
+  content     String   @db.Text // 分块内容
+  embedding   Float[]  // 向量嵌入
+  metadata    Json?    // 分块元数据
+  createdAt   DateTime @default(now())
+  
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@unique([documentId, chunkIndex])
+  @@map("document_embeddings")
+}
+
+model LegalKnowledgeBase {
+  id            String   @id @default(cuid())
+  title         String
+  content       String   @db.Text
+  type          LegalDocumentType @default(REGULATION)
+  jurisdiction  String   @default("federal")
+  language      String   @default("en")
+  source        String?  // 来源URL或引用
+  effectiveDate DateTime?
+  lastUpdated   DateTime @default(now())
+  tags          String[]
+  
+  // RAG相关
+  embeddings    LegalEmbedding[]
+  
+  @@map("legal_knowledge_base")
+}
+
+model LegalEmbedding {
+  id              String   @id @default(cuid())
+  knowledgeBaseId String
+  chunkIndex      Int
+  content         String   @db.Text
+  embedding       Float[]
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  
+  knowledgeBase LegalKnowledgeBase @relation(fields: [knowledgeBaseId], references: [id], onDelete: Cascade)
+  
+  @@unique([knowledgeBaseId, chunkIndex])
+  @@map("legal_embeddings")
+}
+
+// ================================
+// 法律咨询和查询 (Legal Consultation & Queries)
+// ================================
+
+model Consultation {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  type          ConsultationType @default(GENERAL)
+  jurisdiction  String   @default("federal")
+  priority      ConsultationPriority @default(MEDIUM)
+  status        ConsultationStatus @default(OPEN)
+  projectId     String?
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关联关系
+  project       Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  queries       LegalQuery[]
+  conversations Conversation[]
+
+  @@map("consultations")
+}
+
+model LegalQuery {
+  id              String   @id @default(cuid())
+  question        String   @db.Text
+  context         String?  @db.Text
+  jurisdiction    String   @default("federal")
+  category        String?
+  response        String?  @db.Text
+  confidence      Float?   @default(0.0)
+  sources         Json?    // 引用的法律条文和文档
+  feedback        QueryFeedback?
+  processingTime  Int?     // 毫秒
+  consultationId  String?
+  projectId       String?
+  userId          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // 关联关系
+  consultation    Consultation? @relation(fields: [consultationId], references: [id], onDelete: SetNull)
+  project         Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("legal_queries")
+}
+
+// ================================
+// LLM对话历史 (LLM Conversation History)
+// ================================
+
+model Conversation {
+  id            String   @id @default(cuid())
+  title         String?
+  type          ConversationType @default(LEGAL_QUERY)
+  userId        String
+  projectId     String?
+  consultationId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关联关系
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project       Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  consultation  Consultation? @relation(fields: [consultationId], references: [id], onDelete: SetNull)
+  messages      ConversationMessage[]
+
+  @@map("conversations")
+}
+
+model ConversationMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           MessageRole @default(USER) // USER, ASSISTANT, SYSTEM
+  content        String   @db.Text
+  metadata       Json?    // 额外信息，如模型参数、tokens等
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("conversation_messages")
+}
+
+// ================================
+// Prompt模板管理 (Prompt Template Management)
+// ================================
+
+model PromptTemplate {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  category      PromptCategory @default(GENERAL)
+  jurisdiction  String   @default("federal")
+  language      String   @default("en")
+  content       String   @db.Text
+  variables     Json?    // 模板变量定义
+  tags          String[] // 标签数组
+  isPublic      Boolean  @default(false)
+  usage         Int      @default(0) // 使用次数
+  rating        Float?   @default(0.0) // 用户评分
+  complexity    TemplateComplexity @default(BEGINNER)
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关联关系
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("prompt_templates")
+}
+
+// ================================
+// 报告管理 (Report Management)
+// ================================
+
+model Report {
+  id            String   @id @default(cuid())
+  title         String
+  type          ReportType @default(EIA)
+  status        ReportStatus @default(DRAFT)
+  jurisdiction  String   @default("federal")
+  language      String   @default("en")
+  content       Json?    // 报告内容结构
+  sections      Json?    // 报告章节
+  progress      Float    @default(0.0) // 完成进度 0-100
+  projectId     String
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关联关系
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+// ================================
+// 订阅和计费 (Subscription & Billing)
+// ================================
+
+model Subscription {
+  id              String   @id @default(cuid())
+  type            SubscriptionType @default(PERSONAL)
+  plan            SubscriptionPlan @default(FREE)
+  status          SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd  Boolean @default(false)
+  stripeCustomerId   String?
+  stripeSubscriptionId String?
+  organizationId  String?
+  userId          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // 关联关系
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+// ================================
+// 枚举类型定义 (Enum Definitions)
+// ================================
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum OrganizationSize {
+  SMALL      // 1-10 employees
+  MEDIUM     // 11-50 employees
+  LARGE      // 51-200 employees
+  ENTERPRISE // 200+ employees
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum OrganizationRole {
+  OWNER
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum ProjectType {
+  MINING
+  EXPLORATION
+  DEVELOPMENT
+  OPERATION
+  CLOSURE
+  CONSULTATION
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum ProjectPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ProjectRole {
+  MANAGER
+  MEMBER
+  VIEWER
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum DocumentType {
+  GENERAL
+  REGULATION
+  GUIDELINE
+  REPORT
+  PERMIT
+  APPLICATION
+  CORRESPONDENCE
+  TECHNICAL
+}
+
+enum DocumentStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LegalDocumentType {
+  REGULATION
+  ACT
+  GUIDELINE
+  POLICY
+  CASE_LAW
+  DIRECTIVE
+}
+
+enum ConsultationType {
+  GENERAL
+  EIA
+  PERMITTING
+  COMPLIANCE
+  INDIGENOUS
+  ENVIRONMENTAL
+}
+
+enum ConsultationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ConsultationStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum QueryFeedback {
+  HELPFUL
+  NOT_HELPFUL
+  PARTIALLY_HELPFUL
+}
+
+enum ConversationType {
+  LEGAL_QUERY
+  DOCUMENT_ANALYSIS
+  REPORT_GENERATION
+  GENERAL_CHAT
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum PromptCategory {
+  GENERAL
+  EIA
+  PERMITTING
+  COMPLIANCE
+  INDIGENOUS
+  ENVIRONMENTAL
+  SAFETY
+  FINANCIAL
+}
+
+enum TemplateComplexity {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ReportType {
+  EIA
+  COMPLIANCE
+  MONITORING
+  CLOSURE
+  TECHNICAL
+  FINANCIAL
+}
+
+enum ReportStatus {
+  DRAFT
+  IN_PROGRESS
+  REVIEW
+  APPROVED
+  SUBMITTED
+}
+
+enum SubscriptionType {
+  PERSONAL
+  ORGANIZATIONAL
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  PAST_DUE
 }

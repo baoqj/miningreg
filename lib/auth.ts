@@ -8,10 +8,18 @@ import { UserRole } from "@prisma/client"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
     CredentialsProvider({
       name: "credentials",
@@ -75,30 +83,27 @@ export const authOptions: NextAuthOptions = {
     },
     async signIn({ user, account, profile }) {
       if (account?.provider === "google") {
-        // Check if user exists, if not create with default settings
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! }
-        })
-
-        if (!existingUser) {
-          // Create user with default preferences
-          await prisma.user.create({
-            data: {
-              email: user.email!,
-              name: user.name,
-              image: user.image,
-              role: UserRole.USER,
-              jurisdictionPreferences: {
-                create: [
-                  { jurisdiction: "federal", enabled: true, priority: 1 },
-                  { jurisdiction: "ontario", enabled: true, priority: 2 },
-                ]
-              },
-              notificationSettings: {
-                create: {}
-              }
-            }
+        try {
+          // Check if user exists, if not create with default settings
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email! }
           })
+
+          if (!existingUser) {
+            // Create user with simplified data structure
+            await prisma.user.create({
+              data: {
+                email: user.email!,
+                name: user.name,
+                image: user.image,
+                role: UserRole.USER,
+                language: "en"
+              }
+            })
+          }
+        } catch (error) {
+          console.error("Error creating Google OAuth user:", error)
+          return false
         }
       }
       return true
@@ -106,7 +111,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
     error: "/auth/error",
-  }
+  },
+  debug: process.env.NODE_ENV === "development"
 }

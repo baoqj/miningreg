@@ -36,10 +36,9 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         name,
-        title,
+        title: title || null,
         role: UserRole.USER,
-        language: "en",
-        timezone: "America/Toronto"
+        language: "en"
       },
       select: {
         id: true,

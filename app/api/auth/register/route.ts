@@ -38,15 +38,8 @@ export async function POST(request: NextRequest) {
         name,
         title,
         role: UserRole.USER,
-        jurisdictionPreferences: {
-          create: [
-            { jurisdiction: "federal", enabled: true, priority: 1 },
-            { jurisdiction: "ontario", enabled: true, priority: 2 },
-          ]
-        },
-        notificationSettings: {
-          create: {}
-        }
+        language: "en",
+        timezone: "America/Toronto"
       },
       select: {
         id: true,

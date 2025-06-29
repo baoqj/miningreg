@@ -3,15 +3,18 @@
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { useTranslations, useLanguage } from '@/components/providers/language-provider'
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Scale, Mail, Lock, User, Briefcase, Chrome } from "lucide-react"
+import { Scale, Mail, Lock, User, Briefcase, Chrome, ArrowLeft } from "lucide-react"
 
 export default function SignUpPage() {
+  const t = useTranslations('auth.signup')
+  const { locale } = useLanguage()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -39,14 +42,14 @@ export default function SignUpPage() {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
+      setError(t('passwordMismatch'))
       setIsLoading(false)
       return
     }
 
     // Validate password strength
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long")
+      setError(t('passwordTooShort'))
       setIsLoading(false)
       return
     }
@@ -68,11 +71,11 @@ export default function SignUpPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || "An error occurred")
+        setError(data.error || t('error'))
         return
       }
 
-      setSuccess("Account created successfully! Signing you in...")
+      setSuccess(t('accountCreated'))
       
       // Auto sign in after successful registration
       const result = await signIn("credentials", {
@@ -87,7 +90,7 @@ export default function SignUpPage() {
       }
 
     } catch (error) {
-      setError("An error occurred. Please try again.")
+      setError(t('error'))
     } finally {
       setIsLoading(false)
     }
@@ -98,7 +101,7 @@ export default function SignUpPage() {
     try {
       await signIn("google", { callbackUrl: "/" })
     } catch (error) {
-      setError("An error occurred with Google sign in")
+      setError(t('error'))
       setIsLoading(false)
     }
   }
@@ -106,23 +109,35 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        {/* Back Button */}
+        <div className="flex justify-start">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/')}
+            className="flex items-center text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            {locale === 'fr' ? 'Retour à l\'accueil' : 'Back to Home'}
+          </Button>
+        </div>
+
         <div className="text-center">
           <div className="flex justify-center">
             <Scale className="h-12 w-12 text-blue-600" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Create your account
+            {t('title')}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Join Canadian Mining Regulatory AI Legal Assistant
+            {t('subtitle')}
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Get started</CardTitle>
+            <CardTitle>{t('getStarted')}</CardTitle>
             <CardDescription>
-              Create your account to access legal compliance tools
+              {t('description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -145,7 +160,7 @@ export default function SignUpPage() {
               disabled={isLoading}
             >
               <Chrome className="mr-2 h-4 w-4" />
-              Continue with Google
+              {t('continueWithGoogle')}
             </Button>
 
             <div className="relative">
@@ -154,21 +169,21 @@ export default function SignUpPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-white px-2 text-muted-foreground">
-                  Or continue with email
+                  {t('orContinueWith')}
                 </span>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full name</Label>
+                <Label htmlFor="name">{t('fullName')}</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Enter your full name"
+                    placeholder={t('fullNamePlaceholder')}
                     value={formData.name}
                     onChange={handleInputChange}
                     className="pl-10"
@@ -178,14 +193,14 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t('emailPlaceholder')}
                     value={formData.email}
                     onChange={handleInputChange}
                     className="pl-10"
@@ -195,14 +210,14 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="title">Job title (optional)</Label>
+                <Label htmlFor="title">{t('jobTitle')}</Label>
                 <div className="relative">
                   <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="title"
                     name="title"
                     type="text"
-                    placeholder="e.g., Senior Legal Analyst"
+                    placeholder={t('jobTitlePlaceholder')}
                     value={formData.title}
                     onChange={handleInputChange}
                     className="pl-10"
@@ -211,14 +226,14 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('password')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="password"
                     name="password"
                     type="password"
-                    placeholder="Create a password"
+                    placeholder={t('passwordPlaceholder')}
                     value={formData.password}
                     onChange={handleInputChange}
                     className="pl-10"
@@ -226,19 +241,19 @@ export default function SignUpPage() {
                   />
                 </div>
                 <p className="text-xs text-gray-500">
-                  Must be at least 8 characters long
+                  {t('passwordRequirement')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm password</Label>
+                <Label htmlFor="confirmPassword">{t('confirmPassword')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
                     type="password"
-                    placeholder="Confirm your password"
+                    placeholder={t('confirmPasswordPlaceholder')}
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     className="pl-10"
@@ -247,19 +262,23 @@ export default function SignUpPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating account..." : "Create account"}
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={isLoading}
+              >
+                {isLoading ? t('creatingAccount') : t('createAccount')}
               </Button>
             </form>
 
             <div className="text-center">
               <div className="text-sm text-gray-600">
-                Already have an account?{" "}
+                {t('hasAccount')}{" "}
                 <Link
                   href="/auth/signin"
                   className="text-blue-600 hover:text-blue-500 font-medium"
                 >
-                  Sign in
+                  {t('signinLink')}
                 </Link>
               </div>
             </div>

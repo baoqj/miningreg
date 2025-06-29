@@ -6,18 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { User, Mail, Briefcase, Phone, Globe, Save, Camera, MapPin, Check, X } from "lucide-react"
+import { User, Mail, Briefcase, Phone, Globe, Save, Camera, MapPin, Check, ArrowLeft, Scale, Shield, Bell } from "lucide-react"
 import { useLanguage, useTranslations } from '@/components/providers/language-provider'
+import { useRouter } from "next/navigation"
 
 export default function ProfilePage() {
   const { data: session, update } = useSession()
   const { locale, setLocale } = useLanguage()
   const t = useTranslations('profile')
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [formData, setFormData] = useState({
@@ -79,240 +80,435 @@ export default function ProfilePage() {
 
   if (!session) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p>Please sign in to view your profile.</p>
+          <Scale className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Please sign in to view your profile.</p>
+          <Button 
+            onClick={() => router.push('/auth/signin')}
+            className="mt-4 bg-blue-600 hover:bg-blue-700"
+          >
+            Sign In
+          </Button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-gray-600">{t('subtitle')}</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-6">
+            {/* Back Button and Title */}
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                onClick={() => router.push('/')}
+                className="flex items-center text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {locale === 'fr' ? 'Retour au tableau de bord' : 'Back to Dashboard'}
+              </Button>
+              <div className="h-6 w-px bg-gray-300"></div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+                <p className="text-sm text-gray-600">{t('subtitle')}</p>
+              </div>
+            </div>
+            
+            {/* User Info */}
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={session.user.image || ""} />
+                <AvatarFallback className="bg-blue-100 text-blue-600">
+                  {session.user.name?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="hidden sm:block">
+                <p className="text-sm font-medium text-gray-900">{session.user.name}</p>
+                <p className="text-xs text-gray-500">{session.user.email}</p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <Tabs defaultValue="general" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="general">{t('tabs.general')}</TabsTrigger>
-            <TabsTrigger value="security">{t('tabs.security')}</TabsTrigger>
-            <TabsTrigger value="notifications">{t('tabs.notifications')}</TabsTrigger>
-            <TabsTrigger value="jurisdictions">{t('tabs.jurisdictions')}</TabsTrigger>
-          </TabsList>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-8">
+          {/* Vertical Sidebar Navigation */}
+          <div className="w-64 flex-shrink-0">
+            <div className="bg-white rounded-lg border border-gray-200 p-1">
+              <Tabs defaultValue="general" className="w-full">
+                <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 space-y-1">
+                  <TabsTrigger 
+                    value="general" 
+                    className="w-full justify-start px-4 py-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-gray-50"
+                  >
+                    <User className="h-4 w-4 mr-3" />
+                    {t('tabs.general')}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="security" 
+                    className="w-full justify-start px-4 py-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-gray-50"
+                  >
+                    <Shield className="h-4 w-4 mr-3" />
+                    {t('tabs.security')}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="notifications" 
+                    className="w-full justify-start px-4 py-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-gray-50"
+                  >
+                    <Bell className="h-4 w-4 mr-3" />
+                    {t('tabs.notifications')}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="jurisdictions" 
+                    className="w-full justify-start px-4 py-3 text-left data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 hover:bg-gray-50"
+                  >
+                    <MapPin className="h-4 w-4 mr-3" />
+                    {t('tabs.jurisdictions')}
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+          </div>
 
-          <TabsContent value="general">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('general.title')}</CardTitle>
-                <CardDescription>
-                  {t('general.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {message && (
-                  <Alert>
-                    <AlertDescription>{message}</AlertDescription>
-                  </Alert>
-                )}
+          {/* Main Content Area */}
+          <div className="flex-1">
+            <Tabs defaultValue="general" className="w-full">
+              <TabsContent value="general">
+                <GeneralTab
+                  session={session}
+                  locale={locale}
+                  setLocale={setLocale}
+                  t={t}
+                  formData={formData}
+                  setFormData={setFormData}
+                  handleInputChange={handleInputChange}
+                  handleSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  message={message}
+                />
+              </TabsContent>
 
-                <div className="flex items-center space-x-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={session.user.image || ""} />
-                    <AvatarFallback className="text-lg">
-                      {session.user.name?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="space-y-2">
-                    <Button variant="outline" size="sm">
-                      <Camera className="h-4 w-4 mr-2" />
-                      Change Photo
-                    </Button>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant="secondary">{session.user.role}</Badge>
-                    </div>
-                  </div>
-                </div>
+              <TabsContent value="security">
+                <SecurityTab locale={locale} />
+              </TabsContent>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          className="pl-10"
-                          placeholder="Enter your full name"
-                        />
-                      </div>
-                    </div>
+              <TabsContent value="notifications">
+                <NotificationsTab locale={locale} />
+              </TabsContent>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          className="pl-10"
-                          placeholder="Enter your email"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Job Title</Label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="title"
-                          name="title"
-                          value={formData.title}
-                          onChange={handleInputChange}
-                          className="pl-10"
-                          placeholder="e.g., Senior Legal Analyst"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          className="pl-10"
-                          placeholder="+1 (555) 123-4567"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="language">{t('general.language')}</Label>
-                      <select
-                        id="language"
-                        name="language"
-                        value={locale}
-                        onChange={(e) => {
-                          const newLocale = e.target.value as 'en' | 'fr'
-                          setLocale(newLocale)
-                          setFormData({ ...formData, language: newLocale })
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="en">English</option>
-                        <option value="fr">Français</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="timezone">Timezone</Label>
-                      <select
-                        id="timezone"
-                        name="timezone"
-                        value={formData.timezone}
-                        onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="America/Toronto">Eastern Time (Toronto)</option>
-                        <option value="America/Vancouver">Pacific Time (Vancouver)</option>
-                        <option value="America/Edmonton">Mountain Time (Edmonton)</option>
-                        <option value="America/Winnipeg">Central Time (Winnipeg)</option>
-                        <option value="America/Halifax">Atlantic Time (Halifax)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={isLoading}>
-                      <Save className="h-4 w-4 mr-2" />
-                      {isLoading ? "Saving..." : "Save Changes"}
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>
-                  Manage your password and security preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 border rounded-lg">
-                    <h3 className="font-medium mb-2">Change Password</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Update your password to keep your account secure
-                    </p>
-                    <Button variant="outline">Change Password</Button>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <h3 className="font-medium mb-2">Two-Factor Authentication</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Add an extra layer of security to your account
-                    </p>
-                    <Button variant="outline">Enable 2FA</Button>
-                  </div>
-
-                  <div className="p-4 border rounded-lg">
-                    <h3 className="font-medium mb-2">Active Sessions</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Manage your active sessions across devices
-                    </p>
-                    <Button variant="outline">View Sessions</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>
-                  Choose how you want to receive notifications
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-600">
-                    Notification settings will be implemented here
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="jurisdictions">
-            <JurisdictionPreferences />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="jurisdictions">
+                <JurisdictionPreferences locale={locale} />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
-function JurisdictionPreferences() {
+function GeneralTab({ session, locale, setLocale, t, formData, setFormData, handleInputChange, handleSubmit, isLoading, message }: any) {
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="border-b border-gray-100 bg-white">
+        <CardTitle className="text-xl text-gray-900">{t('general.title')}</CardTitle>
+        <CardDescription className="text-gray-600">
+          {t('general.description')}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="bg-white p-6">
+        {message && (
+          <Alert className="mb-6 border-blue-200 bg-blue-50">
+            <AlertDescription className="text-blue-800">{message}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Profile Photo Section */}
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg">
+          <div className="flex items-center space-x-6">
+            <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+              <AvatarImage src={session.user.image || ""} />
+              <AvatarFallback className="text-xl bg-blue-100 text-blue-600">
+                {session.user.name?.charAt(0) || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{session.user.name}</h3>
+                <p className="text-gray-600">{session.user.email}</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Button variant="outline" size="sm" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                  <Camera className="h-4 w-4 mr-2" />
+                  {locale === 'fr' ? 'Changer la photo' : 'Change Photo'}
+                </Button>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  {session.user.role}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Personal Information Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                {locale === 'fr' ? 'Nom complet' : 'Full Name'}
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder={locale === 'fr' ? 'Entrez votre nom complet' : 'Enter your full name'}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                {locale === 'fr' ? 'Adresse e-mail' : 'Email Address'}
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder={locale === 'fr' ? 'Entrez votre e-mail' : 'Enter your email'}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+                {locale === 'fr' ? 'Titre du poste' : 'Job Title'}
+              </Label>
+              <div className="relative">
+                <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder={locale === 'fr' ? 'ex: Analyste juridique senior' : 'e.g., Senior Legal Analyst'}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                {locale === 'fr' ? 'Numéro de téléphone' : 'Phone Number'}
+              </Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="+1 (555) 123-4567"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="language" className="text-sm font-medium text-gray-700">
+                {t('general.language')}
+              </Label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <select
+                  id="language"
+                  name="language"
+                  value={locale}
+                  onChange={(e) => {
+                    const newLocale = e.target.value as 'en' | 'fr'
+                    setLocale(newLocale)
+                    setFormData({ ...formData, language: newLocale })
+                  }}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="en">English</option>
+                  <option value="fr">Français</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="timezone" className="text-sm font-medium text-gray-700">
+                {locale === 'fr' ? 'Fuseau horaire' : 'Timezone'}
+              </Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <select
+                  id="timezone"
+                  name="timezone"
+                  value={formData.timezone}
+                  onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                >
+                  <option value="America/Toronto">Eastern Time (Toronto)</option>
+                  <option value="America/Vancouver">Pacific Time (Vancouver)</option>
+                  <option value="America/Edmonton">Mountain Time (Edmonton)</option>
+                  <option value="America/Winnipeg">Central Time (Winnipeg)</option>
+                  <option value="America/Halifax">Atlantic Time (Halifax)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-6 border-t border-gray-100">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {isLoading
+                ? (locale === 'fr' ? 'Enregistrement...' : 'Saving...')
+                : (locale === 'fr' ? 'Enregistrer les modifications' : 'Save Changes')
+              }
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+function SecurityTab({ locale }: any) {
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="border-b border-gray-100 bg-white">
+        <CardTitle className="text-xl text-gray-900">
+          {locale === 'fr' ? 'Paramètres de sécurité' : 'Security Settings'}
+        </CardTitle>
+        <CardDescription className="text-gray-600">
+          {locale === 'fr'
+            ? 'Gérez votre mot de passe et vos préférences de sécurité'
+            : 'Manage your password and security preferences'
+          }
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="bg-white p-6">
+        <div className="space-y-6">
+          <div className="p-6 border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  {locale === 'fr' ? 'Changer le mot de passe' : 'Change Password'}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {locale === 'fr'
+                    ? 'Mettez à jour votre mot de passe pour sécuriser votre compte'
+                    : 'Update your password to keep your account secure'
+                  }
+                </p>
+              </div>
+              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                {locale === 'fr' ? 'Changer le mot de passe' : 'Change Password'}
+              </Button>
+            </div>
+          </div>
+
+          <div className="p-6 border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  {locale === 'fr' ? 'Authentification à deux facteurs' : 'Two-Factor Authentication'}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {locale === 'fr'
+                    ? 'Ajoutez une couche de sécurité supplémentaire à votre compte'
+                    : 'Add an extra layer of security to your account'
+                  }
+                </p>
+              </div>
+              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                {locale === 'fr' ? 'Activer 2FA' : 'Enable 2FA'}
+              </Button>
+            </div>
+          </div>
+
+          <div className="p-6 border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  {locale === 'fr' ? 'Sessions actives' : 'Active Sessions'}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {locale === 'fr'
+                    ? 'Gérez vos sessions actives sur tous les appareils'
+                    : 'Manage your active sessions across devices'
+                  }
+                </p>
+              </div>
+              <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                {locale === 'fr' ? 'Voir les sessions' : 'View Sessions'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function NotificationsTab({ locale }: any) {
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="border-b border-gray-100 bg-white">
+        <CardTitle className="text-xl text-gray-900">
+          {locale === 'fr' ? 'Préférences de notification' : 'Notification Preferences'}
+        </CardTitle>
+        <CardDescription className="text-gray-600">
+          {locale === 'fr'
+            ? 'Choisissez comment vous souhaitez recevoir les notifications'
+            : 'Choose how you want to receive notifications'
+          }
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="bg-white p-6">
+        <div className="space-y-6">
+          <div className="p-6 border border-gray-200 rounded-lg">
+            <div className="text-center py-8">
+              <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {locale === 'fr' ? 'Bientôt disponible' : 'Coming Soon'}
+              </h3>
+              <p className="text-gray-600">
+                {locale === 'fr'
+                  ? 'Les paramètres de notification seront bientôt disponibles'
+                  : 'Notification settings will be available soon'
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function JurisdictionPreferences({ locale }: any) {
   const [preferences, setPreferences] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -411,56 +607,63 @@ function JurisdictionPreferences() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="text-center py-8">
+      <Card className="border-0 shadow-sm">
+        <CardContent className="text-center py-12 bg-white">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading preferences...</p>
+          <p className="mt-4 text-gray-600">
+            {locale === 'fr' ? 'Chargement des préférences...' : 'Loading preferences...'}
+          </p>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <MapPin className="h-5 w-5" />
-          <span>Jurisdiction Preferences</span>
+    <Card className="border-0 shadow-sm">
+      <CardHeader className="border-b border-gray-100 bg-white">
+        <CardTitle className="flex items-center space-x-2 text-xl text-gray-900">
+          <MapPin className="h-5 w-5 text-blue-600" />
+          <span>
+            {locale === 'fr' ? 'Préférences de juridiction' : 'Jurisdiction Preferences'}
+          </span>
         </CardTitle>
-        <CardDescription>
-          Select the jurisdictions you want to receive legal updates and notifications for
+        <CardDescription className="text-gray-600">
+          {locale === 'fr'
+            ? 'Sélectionnez les juridictions pour lesquelles vous souhaitez recevoir des mises à jour juridiques et des notifications'
+            : 'Select the jurisdictions you want to receive legal updates and notifications for'
+          }
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="bg-white p-6">
         {message && (
-          <Alert>
-            <AlertDescription>{message}</AlertDescription>
+          <Alert className="mb-6 border-blue-200 bg-blue-50">
+            <AlertDescription className="text-blue-800">{message}</AlertDescription>
           </Alert>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {availableJurisdictions.map((jurisdiction) => (
             <div
               key={jurisdiction.id}
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+              className={`p-5 border rounded-lg cursor-pointer transition-all duration-200 ${
                 isJurisdictionEnabled(jurisdiction.id)
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-blue-500 bg-blue-50 shadow-sm'
+                  : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
               }`}
               onClick={() => handleToggleJurisdiction(jurisdiction.id)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h3 className="font-medium">{jurisdiction.name}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">{jurisdiction.name}</h3>
                   <p className="text-sm text-gray-600">{jurisdiction.description}</p>
                 </div>
                 <div className="ml-4">
                   {isJurisdictionEnabled(jurisdiction.id) ? (
-                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
                       <Check className="h-4 w-4 text-white" />
                     </div>
                   ) : (
-                    <div className="w-6 h-6 border-2 border-gray-300 rounded-full"></div>
+                    <div className="w-6 h-6 border-2 border-gray-300 rounded-full hover:border-blue-400 transition-colors"></div>
                   )}
                 </div>
               </div>
@@ -468,10 +671,17 @@ function JurisdictionPreferences() {
           ))}
         </div>
 
-        <div className="flex justify-end">
-          <Button onClick={handleSavePreferences} disabled={isSaving}>
+        <div className="flex justify-end pt-6 border-t border-gray-100">
+          <Button
+            onClick={handleSavePreferences}
+            disabled={isSaving}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+          >
             <Save className="h-4 w-4 mr-2" />
-            {isSaving ? "Saving..." : "Save Preferences"}
+            {isSaving
+              ? (locale === 'fr' ? 'Enregistrement...' : 'Saving...')
+              : (locale === 'fr' ? 'Enregistrer les préférences' : 'Save Preferences')
+            }
           </Button>
         </div>
       </CardContent>

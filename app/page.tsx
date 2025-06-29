@@ -47,6 +47,8 @@ import {
   HelpCircle,
   Shield,
   Languages,
+  MessageSquare,
+  FolderOpen,
   Globe,
   Key,
   BarChart3,
@@ -63,14 +65,22 @@ export default function MiningLegalAssistant() {
   const [consultationQuery, setConsultationQuery] = useState("")
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Redirect to login if not authenticated
+  // Show loading state
   if (status === "loading") {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-navy-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-400 mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading Canadian Mining Regulatory AI...</p>
+          <p className="text-gray-300 text-sm mt-2">Initializing session...</p>
+        </div>
+      </div>
+    )
   }
 
+  // Show homepage for unauthenticated users
   if (status === "unauthenticated") {
-    router.push("/auth/signin")
-    return null
+    return <HomePage />
   }
 
   return (
@@ -1632,6 +1642,326 @@ export default function MiningLegalAssistant() {
         </main>
       </div>
       <LanguageDebug />
+    </div>
+  )
+}
+
+// Homepage component for unauthenticated users
+function HomePage() {
+  const { locale, setLocale } = useLanguage()
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-blue-900 to-blue-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            {/* Logo */}
+            <div className="flex items-center space-x-2">
+              <Scale className="h-8 w-8 text-yellow-400" />
+              <div>
+                <div className="text-lg font-bold">
+                  {locale === 'fr' ? 'Réglementation Minière Canadienne' : 'Canadian Mining Regulatory'}
+                </div>
+                <div className="text-sm text-blue-200">
+                  {locale === 'fr' ? 'Assistant IA Juridique' : 'AI Legal Assistant'}
+                </div>
+              </div>
+            </div>
+
+            {/* Language Switcher */}
+            <div className="flex items-center space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center text-white hover:text-yellow-400 transition-colors">
+                    <Globe className="h-5 w-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setLocale('en')}>
+                    🇺🇸 English
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLocale('fr')}>
+                    🇫🇷 Français
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Auth buttons */}
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-white border-white hover:bg-white hover:text-blue-900 bg-transparent"
+                  onClick={() => window.location.href = '/auth/signin'}
+                >
+                  {locale === 'fr' ? 'Se connecter' : 'Sign In'}
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold border-0"
+                  onClick={() => window.location.href = '/auth/signup'}
+                >
+                  {locale === 'fr' ? 'S\'inscrire' : 'Sign Up'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero section */}
+      <main>
+        <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+              {locale === 'fr'
+                ? 'Assistant IA Juridique pour l\'Industrie Minière Canadienne'
+                : 'AI-Powered Legal Assistant for Canadian Mining Industry'
+              }
+            </h1>
+            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              {locale === 'fr'
+                ? 'Naviguez dans les réglementations minières complexes avec confiance. Obtenez des conseils juridiques instantanés, générez des rapports de conformité et restez informé des changements réglementaires dans toutes les juridictions canadiennes.'
+                : 'Navigate complex mining regulations with confidence. Get instant legal guidance, generate compliance reports, and stay updated with regulatory changes across all Canadian jurisdictions.'
+              }
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold px-8 py-3 text-lg border-0"
+                onClick={() => window.location.href = '/auth/signup'}
+              >
+                {locale === 'fr' ? 'Commencer Gratuitement' : 'Get Started Free'}
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-white border-white hover:bg-white hover:text-blue-900 px-8 py-3 text-lg bg-transparent"
+                onClick={() => window.location.href = '/auth/signin'}
+              >
+                {locale === 'fr' ? 'En Savoir Plus' : 'Learn More'}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Features section */}
+        <div className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                {locale === 'fr'
+                  ? 'Solutions Juridiques Minières Complètes'
+                  : 'Comprehensive Mining Legal Solutions'
+                }
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                {locale === 'fr'
+                  ? 'Tout ce dont vous avez besoin pour assurer la conformité et rationaliser vos opérations minières à travers le Canada'
+                  : 'Everything you need to ensure compliance and streamline your mining operations across Canada'
+                }
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* AI Legal Consultation */}
+              <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">AI Legal Consultation</h3>
+                <p className="text-gray-600 mb-4">
+                  Get answers to complex mining legal questions with our AI-powered legal assistant.
+                </p>
+                <ul className="text-sm text-gray-500 space-y-1 text-left">
+                  <li>• Instant answers to legal questions</li>
+                  <li>• Bilingual support (English/French)</li>
+                  <li>• Real-time legal guidance</li>
+                </ul>
+              </div>
+
+              {/* Regulations Explorer */}
+              <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Regulations Explorer</h3>
+                <p className="text-gray-600 mb-4">
+                  Navigate through current mining regulations with intelligent search and filtering.
+                </p>
+                <ul className="text-sm text-gray-500 space-y-1 text-left">
+                  <li>• Real-time updates and alerts</li>
+                  <li>• Cross-jurisdictional analysis</li>
+                  <li>• Quick reference guides</li>
+                </ul>
+              </div>
+
+              {/* EIA Report Generation */}
+              <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FileText className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">EIA Report Generation</h3>
+                <p className="text-gray-600 mb-4">
+                  Automate environmental impact assessment reports with AI-assisted generation.
+                </p>
+                <ul className="text-sm text-gray-500 space-y-1 text-left">
+                  <li>• Streamlined report generation</li>
+                  <li>• Compliance with regulations</li>
+                  <li>• Expert review available</li>
+                </ul>
+              </div>
+
+              {/* Project Management */}
+              <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FolderOpen className="h-8 w-8 text-orange-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Project Management</h3>
+                <p className="text-gray-600 mb-4">
+                  Manage mining projects from exploration to closure with integrated compliance tracking.
+                </p>
+                <ul className="text-sm text-gray-500 space-y-1 text-left">
+                  <li>• Project lifecycle management</li>
+                  <li>• Compliance tracking</li>
+                  <li>• Risk assessment tools</li>
+                </ul>
+              </div>
+
+              {/* Legal Updates */}
+              <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Bell className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Legal Updates</h3>
+                <p className="text-gray-600 mb-4">
+                  Stay informed with real-time notifications about regulatory changes affecting your projects.
+                </p>
+                <ul className="text-sm text-gray-500 space-y-1 text-left">
+                  <li>• Personalized update feeds</li>
+                  <li>• Impact analysis</li>
+                  <li>• Expert insights</li>
+                </ul>
+              </div>
+
+              {/* Team Collaboration */}
+              <div className="bg-white p-8 rounded-lg border border-gray-200 text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">Team Collaboration</h3>
+                <p className="text-gray-600 mb-4">
+                  Collaborate with your team and external experts or consultants on compliance matters.
+                </p>
+                <ul className="text-sm text-gray-500 space-y-1 text-left">
+                  <li>• Multi-user workspaces</li>
+                  <li>• Expert consultation network</li>
+                  <li>• Secure document sharing</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              {locale === 'fr'
+                ? 'Prêt à Transformer Votre Conformité Minière?'
+                : 'Ready to Transform Your Mining Compliance?'
+              }
+            </h2>
+            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              {locale === 'fr'
+                ? 'Rejoignez des centaines d\'entreprises minières qui utilisent déjà notre assistant IA juridique pour rationaliser leur conformité réglementaire.'
+                : 'Join hundreds of mining companies already using our AI legal assistant to streamline their regulatory compliance.'
+              }
+            </p>
+            <Button
+              size="lg"
+              className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold px-8 py-3 text-lg border-0"
+              onClick={() => window.location.href = '/auth/signup'}
+            >
+              {locale === 'fr' ? 'Commencer l\'Essai Gratuit' : 'Start Free Trial'}
+            </Button>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gradient-to-r from-blue-900 to-blue-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Company Info */}
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <Scale className="h-8 w-8 text-yellow-400" />
+                <div>
+                  <div className="text-lg font-bold">
+                    {locale === 'fr' ? 'Réglementation Minière Canadienne' : 'Canadian Mining Regulatory'}
+                  </div>
+                  <div className="text-sm text-blue-200">
+                    {locale === 'fr' ? 'Assistant IA Juridique' : 'AI Legal Assistant'}
+                  </div>
+                </div>
+              </div>
+              <p className="text-blue-100 text-sm">
+                {locale === 'fr'
+                  ? 'L\'assistant IA juridique le plus complet pour l\'industrie minière canadienne. Naviguez dans les réglementations complexes avec confiance.'
+                  : 'The most comprehensive AI-powered legal assistant for the Canadian mining industry. Navigate complex regulations with confidence.'
+                }
+              </p>
+            </div>
+
+            {/* Product Links */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">
+                {locale === 'fr' ? 'Produit' : 'Product'}
+              </h3>
+              <ul className="space-y-2 text-blue-100">
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {locale === 'fr' ? 'Fonctionnalités' : 'Features'}
+                </a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {locale === 'fr' ? 'Tarification' : 'Pricing'}
+                </a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {locale === 'fr' ? 'Entreprise' : 'Enterprise'}
+                </a></li>
+              </ul>
+            </div>
+
+            {/* Support Links */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">
+                {locale === 'fr' ? 'Support' : 'Support'}
+              </h3>
+              <ul className="space-y-2 text-blue-100">
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {locale === 'fr' ? 'Centre d\'Aide' : 'Help Center'}
+                </a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {locale === 'fr' ? 'Contact' : 'Contact'}
+                </a></li>
+                <li><a href="#" className="hover:text-white transition-colors">
+                  {locale === 'fr' ? 'Politique de Confidentialité' : 'Privacy Policy'}
+                </a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-blue-700 mt-8 pt-8 text-center">
+            <p className="text-blue-200 text-sm">
+              {locale === 'fr'
+                ? '© 2024 Assistant IA Juridique pour la Réglementation Minière Canadienne. Tous droits réservés.'
+                : '© 2024 Canadian Mining Regulatory AI Legal Assistant. All rights reserved.'
+              }
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

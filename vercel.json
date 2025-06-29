@@ -94,6 +94,7 @@
   ],
   "regions": ["iad1", "sfo1", "fra1"],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "DEPLOYMENT_TRIGGER": "2025-01-29"
   }
 }

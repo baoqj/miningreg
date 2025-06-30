@@ -550,5 +550,63 @@
     "stakeholderEngagementPlan": "Stakeholder Engagement Plan",
     "selectJurisdiction": "Select jurisdiction...",
     "allJurisdictions": "All Jurisdictions"
+  },
+  "homepage": {
+    "features": {
+      "aiLegalConsultation": {
+        "title": "AI Legal Consultation",
+        "description": "Get answers to complex mining legal questions with our AI-powered legal assistant.",
+        "features": [
+          "Instant answers to legal questions",
+          "Bilingual support (English/French)",
+          "Real-time legal guidance"
+        ]
+      },
+      "regulationsExplorer": {
+        "title": "Regulations Explorer",
+        "description": "Navigate through current mining regulations with intelligent search and filtering.",
+        "features": [
+          "Real-time updates and alerts",
+          "Cross-jurisdictional analysis",
+          "Quick reference guides"
+        ]
+      },
+      "eiaReportGeneration": {
+        "title": "EIA Report Generation",
+        "description": "Automate environmental impact assessment reports with AI-assisted generation.",
+        "features": [
+          "Streamlined report generation",
+          "Compliance with regulations",
+          "Expert review available"
+        ]
+      },
+      "projectManagement": {
+        "title": "Project Management",
+        "description": "Manage mining projects from exploration to closure with integrated compliance tracking.",
+        "features": [
+          "Project lifecycle management",
+          "Compliance tracking",
+          "Risk assessment tools"
+        ]
+      },
+      "legalUpdates": {
+        "title": "Legal Updates",
+        "description": "Stay informed with real-time notifications about regulatory changes affecting your projects.",
+        "features": [
+          "Personalized update feeds",
+          "Impact analysis",
+          "Expert insights"
+        ]
+      },
+      "teamCollaboration": {
+        "title": "Team Collaboration",
+        "description": "Collaborate with your team and external experts or consultants on compliance matters.",
+        "features": [
+          "Multi-user workspaces",
+          "Expert consultation network",
+          "Secure document sharing"
+        ]
+      }
+    }
   }
 }

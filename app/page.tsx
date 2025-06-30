@@ -1649,6 +1649,7 @@ export default function MiningLegalAssistant() {
 // Homepage component for unauthenticated users
 function HomePage() {
   const { locale, setLocale } = useLanguage()
+  const t = useTranslations()
 
   return (
     <div className="min-h-screen bg-white">
@@ -1770,14 +1771,14 @@ function HomePage() {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <MessageSquare className="h-8 w-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">AI Legal Consultation</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('homepage.features.aiLegalConsultation.title')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Get answers to complex mining legal questions with our AI-powered legal assistant.
+                  {t('homepage.features.aiLegalConsultation.description')}
                 </p>
                 <ul className="text-sm text-gray-500 space-y-1 text-left">
-                  <li>• Instant answers to legal questions</li>
-                  <li>• Bilingual support (English/French)</li>
-                  <li>• Real-time legal guidance</li>
+                  {t('homepage.features.aiLegalConsultation.features').map((feature: string, index: number) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -1786,14 +1787,14 @@ function HomePage() {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <BookOpen className="h-8 w-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Regulations Explorer</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('homepage.features.regulationsExplorer.title')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Navigate through current mining regulations with intelligent search and filtering.
+                  {t('homepage.features.regulationsExplorer.description')}
                 </p>
                 <ul className="text-sm text-gray-500 space-y-1 text-left">
-                  <li>• Real-time updates and alerts</li>
-                  <li>• Cross-jurisdictional analysis</li>
-                  <li>• Quick reference guides</li>
+                  {t('homepage.features.regulationsExplorer.features').map((feature: string, index: number) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -1802,14 +1803,14 @@ function HomePage() {
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FileText className="h-8 w-8 text-purple-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">EIA Report Generation</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('homepage.features.eiaReportGeneration.title')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Automate environmental impact assessment reports with AI-assisted generation.
+                  {t('homepage.features.eiaReportGeneration.description')}
                 </p>
                 <ul className="text-sm text-gray-500 space-y-1 text-left">
-                  <li>• Streamlined report generation</li>
-                  <li>• Compliance with regulations</li>
-                  <li>• Expert review available</li>
+                  {t('homepage.features.eiaReportGeneration.features').map((feature: string, index: number) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -1818,14 +1819,14 @@ function HomePage() {
                 <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FolderOpen className="h-8 w-8 text-orange-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Project Management</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('homepage.features.projectManagement.title')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Manage mining projects from exploration to closure with integrated compliance tracking.
+                  {t('homepage.features.projectManagement.description')}
                 </p>
                 <ul className="text-sm text-gray-500 space-y-1 text-left">
-                  <li>• Project lifecycle management</li>
-                  <li>• Compliance tracking</li>
-                  <li>• Risk assessment tools</li>
+                  {t('homepage.features.projectManagement.features').map((feature: string, index: number) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -1834,14 +1835,14 @@ function HomePage() {
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Bell className="h-8 w-8 text-red-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Legal Updates</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('homepage.features.legalUpdates.title')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Stay informed with real-time notifications about regulatory changes affecting your projects.
+                  {t('homepage.features.legalUpdates.description')}
                 </p>
                 <ul className="text-sm text-gray-500 space-y-1 text-left">
-                  <li>• Personalized update feeds</li>
-                  <li>• Impact analysis</li>
-                  <li>• Expert insights</li>
+                  {t('homepage.features.legalUpdates.features').map((feature: string, index: number) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -1850,14 +1851,14 @@ function HomePage() {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">Team Collaboration</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{t('homepage.features.teamCollaboration.title')}</h3>
                 <p className="text-gray-600 mb-4">
-                  Collaborate with your team and external experts or consultants on compliance matters.
+                  {t('homepage.features.teamCollaboration.description')}
                 </p>
                 <ul className="text-sm text-gray-500 space-y-1 text-left">
-                  <li>• Multi-user workspaces</li>
-                  <li>• Expert consultation network</li>
-                  <li>• Secure document sharing</li>
+                  {t('homepage.features.teamCollaboration.features').map((feature: string, index: number) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
                 </ul>
               </div>
             </div>

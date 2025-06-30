@@ -550,5 +550,63 @@
     "stakeholderEngagementPlan": "Plan d'engagement des parties prenantes",
     "selectJurisdiction": "Sélectionner la juridiction...",
     "allJurisdictions": "Toutes les juridictions"
+  },
+  "homepage": {
+    "features": {
+      "aiLegalConsultation": {
+        "title": "Consultation Juridique IA",
+        "description": "Obtenez des réponses aux questions juridiques complexes sur l'exploitation minière avec notre assistant juridique alimenté par l'IA.",
+        "features": [
+          "Réponses instantanées aux questions juridiques",
+          "Support bilingue (anglais/français)",
+          "Conseils juridiques en temps réel"
+        ]
+      },
+      "regulationsExplorer": {
+        "title": "Explorateur de Réglementations",
+        "description": "Naviguez dans les réglementations minières actuelles avec recherche et filtrage intelligents.",
+        "features": [
+          "Mises à jour et alertes en temps réel",
+          "Analyse inter-juridictionnelle",
+          "Guides de référence rapide"
+        ]
+      },
+      "eiaReportGeneration": {
+        "title": "Génération de Rapports EIE",
+        "description": "Automatisez les rapports d'évaluation d'impact environnemental avec génération assistée par IA.",
+        "features": [
+          "Génération de rapports simplifiée",
+          "Conformité aux réglementations",
+          "Révision d'expert disponible"
+        ]
+      },
+      "projectManagement": {
+        "title": "Gestion de Projet",
+        "description": "Gérez les projets miniers de l'exploration à la fermeture avec suivi de conformité intégré.",
+        "features": [
+          "Gestion du cycle de vie du projet",
+          "Suivi de la conformité",
+          "Outils d'évaluation des risques"
+        ]
+      },
+      "legalUpdates": {
+        "title": "Mises à Jour Juridiques",
+        "description": "Restez informé avec des notifications en temps réel sur les changements réglementaires affectant vos projets.",
+        "features": [
+          "Flux de mises à jour personnalisés",
+          "Analyse d'impact",
+          "Perspectives d'experts"
+        ]
+      },
+      "teamCollaboration": {
+        "title": "Collaboration d'Équipe",
+        "description": "Collaborez avec votre équipe et des experts externes ou consultants sur les questions de conformité.",
+        "features": [
+          "Espaces de travail multi-utilisateurs",
+          "Réseau de consultation d'experts",
+          "Partage sécurisé de documents"
+        ]
+      }
+    }
   }
 }

@@ -1,16 +1,27 @@
 # Canadian Mining Regulatory 系统功能文档
 
 [1 项目基础架构与部署](#1-项目基础架构与部署)
+
 [2 用户身份与权限管理](#2-用户身份与权限管理)
+
 [3 法律法规数据采集与入库](#3-法律法规数据采集与入库)
+
 [4 法规知识向量化与存储](#4-法规知识向量化与存储)
+
 [5 法规智能问答系统（Legal AI Consultation）](#5-法规智能问答系统legal-ai-consultation)
+
 [6 项目管理模块（Project Workspace）](#6-项目管理模块project-workspace)
+
 [7 可研报告生成模块（EIA / Report AI）](#7-可研报告生成模块eia--report-ai)
+
 [8 法规浏览与更新比对模块（Regulations Explorer）](#8-法规浏览与更新比对模块regulations-explorer)
+
 [9 Prompt模板与插件系统（Prompt Templates & Plugins）](#9-prompt-模板与插件系统prompt-templates--plugins)
+
 [10 Dashboard（仪表盘总览）](#10-dashboard仪表盘总览)
+
 [11 系统管理与监控模块（System Admin & Monitoring）](#11-系统管理与监控模块system-admin--monitoring)
+
 [12 用户功能与团队组织管理](#12-用户功能与团队组织管理)
 
 ---
